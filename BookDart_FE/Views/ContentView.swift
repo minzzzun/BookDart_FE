@@ -19,6 +19,9 @@ struct ContentView: View {
                         MainView()
                     case "/login":
                         LoginView()
+                    case "/signup":
+                        SignUpView()
+                        
                     default:
                         Text("알 수 없는 경로 : \(route.name) ")
                     }
