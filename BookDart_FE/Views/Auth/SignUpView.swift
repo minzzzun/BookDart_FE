@@ -58,6 +58,7 @@ struct SignUpView: View {
                 }
             }
         }
+        .navigationBarHidden(true)
         .onChange(of: viewModel.isSignUpSuccess) { _, success in
             if success {
                 router.back()

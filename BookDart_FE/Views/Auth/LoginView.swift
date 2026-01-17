@@ -53,6 +53,7 @@ struct LoginView: View {
             
             Spacer().frame(height: 32)
         }
+        .navigationBarHidden(true)
         .padding(.horizontal, 24)
         .background(Color(.systemBackground))
         .onChange(of: viewModel.isLoginSuccess) { _, success in

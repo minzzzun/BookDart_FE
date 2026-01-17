@@ -141,7 +141,7 @@ final class AuthManager {
     // MARK: - Logout
     
     /// 로그아웃 (토큰 삭제)
-    func logout() {
+    func logout(){
         tokenManager.clearTokens()
     }
 }

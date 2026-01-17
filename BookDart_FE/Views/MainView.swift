@@ -21,10 +21,7 @@ struct MainView: View {
                 Text("로그인")
             }
         }
-        
-        
-        
-        
-        
+        .navigationBarHidden(true)
+    
     }
 }

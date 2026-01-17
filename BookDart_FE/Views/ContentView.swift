@@ -9,10 +9,17 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var router = NavigationRouter()
-
+    @StateObject var authState = AuthStateViewModel()
+    
     var body: some View {
         NavigationStack(path: $router.path) {
-            MainView()
+            Group {
+                if (authState.isLoggedIn){
+                    MainView()
+                } else {
+                    LoginView()
+                }
+            }
                 .navigationDestination(for: Route.self) { route in
                     switch route.name {
                     case "/":
@@ -28,5 +35,6 @@ struct ContentView: View {
                 }
         }
         .environmentObject(router)
+        .environmentObject(authState)
     }
 }
