@@ -12,11 +12,6 @@ struct MainView: View {
     @EnvironmentObject var router: NavigationRouter
     @EnvironmentObject var appState: AppStates
     
-    //    var body: some View {
-    //        PostListView()
-    //            .navigationBarHidden(true)
-    //    }
-    
     var body: some View {
         VStack(spacing: 0) {
             Group {

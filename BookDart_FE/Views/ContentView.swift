@@ -52,6 +52,9 @@ struct ContentView: View {
         case "/post/create":
             PostCreateView()
             
+        case "/notice/detail":
+            NoticeDetailView(noticeId: route.arguments as? Int ?? 0)
+            
         default:
             Text("알 수 없는 경로: \(route.name)")
         }
