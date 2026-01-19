@@ -2,7 +2,7 @@
 //  FABButton.swift
 //  BookDart_FE
 //
-//  Created by 김민준 on 1/18/26.
+//  Created by 김민준 on 1/19/26.
 //
 
 import SwiftUI
@@ -19,17 +19,25 @@ struct FABButton: View {
                 Spacer()
                 Button(action: action) {
                     Image(systemName: icon)
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                        .font(.system(size: 24, weight: .semibold))
                         .foregroundColor(.white)
                         .frame(width: 56, height: 56)
                         .background(Color.accentColor)
                         .clipShape(Circle())
-                        .shadow(radius: 4)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                 }
                 .padding(.trailing, 20)
                 .padding(.bottom, 20)
             }
+        }
+    }
+}
+
+#Preview {
+    ZStack {
+        Color.gray.opacity(0.1)
+        FABButton(icon: "plus") {
+            print("FAB tapped")
         }
     }
 }

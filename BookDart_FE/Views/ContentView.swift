@@ -7,9 +7,11 @@
 
 import SwiftUI
 
+@MainActor
 struct ContentView: View {
     
     @StateObject private var router = NavigationRouter()
+    @StateObject private var appStates = AppStates()
     @StateObject var authState = AuthStateViewModel()
     
     var body: some View {
@@ -26,11 +28,12 @@ struct ContentView: View {
             }
         }
         .environmentObject(router)
+        .environmentObject(appStates)
         .environmentObject(authState)
     }
     
     // MARK: - Navigation Destination
-    
+    @MainActor
     @ViewBuilder
     private func destinationView(for route: Route) -> some View {
         switch route.name {
