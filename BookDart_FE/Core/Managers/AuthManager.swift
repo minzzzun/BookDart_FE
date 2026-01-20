@@ -21,6 +21,7 @@ final class AuthManager {
         static let login = NetworkConfig.baseURL + "/api/login"
         static let signUp = NetworkConfig.baseURL + "/api/user/signup"
         static let refreshToken = NetworkConfig.baseURL + "/api/auth"
+        static let deleteAccount = NetworkConfig.baseURL + "/api/user"
     }
     
     private enum HeaderKey {
@@ -144,4 +145,37 @@ final class AuthManager {
     func logout(){
         tokenManager.clearTokens()
     }
+    
+    
+    func deleteAccount(){
+        //TODO: 나중에 삭제 로직 추가
+        print("회원 삭제")
+    }
+    
+//    func deleteAccount() async throws {
+//        //TODO: 나중에 삭제 로직 추가
+//        print("회원 삭제")
+//        
+//        guard let bearerRefreshToken = tokenManager.bearerRefreshToken else {
+//            throw AuthError.tokenNotFound
+//        }
+//        
+//        let headers: HTTPHeaders = [
+//            HeaderKey.refresh: bearerRefreshToken
+//        ]
+//        
+//        let response = await AF.request(
+//            Endpoint.deleteAccount,
+//            method: .delete,
+//            headers: headers
+//        )
+//            .serializingString(emptyResponseCodes: [200, 201, 204])
+//            .response
+//        
+//        let statusCode = response.response?.statusCode ?? -1
+//        
+//        if statusCode < 200 || statusCode >= 300 {
+//            throw AuthError.networkError("회원 탈퇴실패: HTTP \(statusCode)")
+//        }
+//    }
 }
