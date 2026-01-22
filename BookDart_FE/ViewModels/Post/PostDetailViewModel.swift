@@ -14,7 +14,7 @@ final class PostDetailViewModel: ObservableObject {
     // MARK: - Published Properties
     
     @Published var post: Post?
-    @Published var isLoading: Bool = false
+    @Published var isLoading: Bool = true
     @Published var errorMessage: String?
     
     // MARK: - Private Properties
@@ -25,7 +25,7 @@ final class PostDetailViewModel: ObservableObject {
     
     /// 게시글 상세 정보 로딩
     func loadPost(id: Int) {
-        guard !isLoading else { return }
+//        guard !isLoading else { return }
         
         isLoading = true
         errorMessage = nil

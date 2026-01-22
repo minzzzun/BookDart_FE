@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct PostContentView: View {
     
     let post: Post

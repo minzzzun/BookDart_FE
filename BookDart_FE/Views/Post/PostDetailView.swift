@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct PostDetailView: View {
     
     @EnvironmentObject var router: NavigationRouter
@@ -25,7 +26,10 @@ struct PostDetailView: View {
                     }
                 }
             }
-            .onAppear { viewModel.loadPost(id: postId) }
+//            .onAppear { viewModel.loadPost(id: postId) }
+            .task {
+                viewModel.loadPost(id: postId)
+            }
     }
     
     @ViewBuilder
@@ -38,6 +42,8 @@ struct PostDetailView: View {
             }
         } else if let post = viewModel.post {
             PostContentView(post: post)
+        } else {
+            LoadingView()
         }
     }
 }
