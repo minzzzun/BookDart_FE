@@ -31,8 +31,20 @@ final class TextRecognitionManager {
         from image: UIImage,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
+        // #region agent log
+        if let data = try? JSONSerialization.data(withJSONObject: ["location": "TextRecognitionManager.swift:30", "message": "recognizeText called", "data": ["imageSize": ["width": image.size.width, "height": image.size.height]], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "C"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+            let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+            if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+        }
+        // #endregion
         // 전처리된 이미지로 변환
         guard let cgImage = processForOCR(image: image) else {
+            // #region agent log
+            if let data = try? JSONSerialization.data(withJSONObject: ["location": "TextRecognitionManager.swift:38", "message": "processForOCR returned nil", "data": [:], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "C"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+                let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+                if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+            }
+            // #endregion
             completion(.failure(TextRecognitionError.imageProcessingFailed))
             return
         }
@@ -60,6 +72,13 @@ final class TextRecognitionManager {
             
             let resultText = recognizedStrings.joined(separator: "\n")
             
+            // #region agent log
+            if let data = try? JSONSerialization.data(withJSONObject: ["location": "TextRecognitionManager.swift:61", "message": "Vision OCR result", "data": ["observationsCount": observations.count, "recognizedStringsCount": recognizedStrings.count, "resultTextLength": resultText.count, "resultPreview": String(resultText.prefix(100))], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "D"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+                let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+                if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+            }
+            // #endregion
+            
             DispatchQueue.main.async {
                 if resultText.isEmpty {
                     completion(.failure(TextRecognitionError.noTextFound))
@@ -72,7 +91,8 @@ final class TextRecognitionManager {
         // 인식 옵션 설정
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = true
-        request.recognitionLanguages = ["ko-KR", "en-US"]  // 한국어 + 영어
+        request.recognitionLanguages = ["ko-KR"]
+//        request.recognitionLanguages = ["ko-KR", "en-US"]// 한국어 + 영어
         request.minimumTextHeight = 0.02
         
         // 백그라운드에서 실행

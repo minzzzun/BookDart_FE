@@ -56,7 +56,7 @@ struct PostCreateView: View {
         }
         .fullScreenCover(isPresented: $viewModel.isScanning) {
             ScannerSheet(
-                onCapture: viewModel.handleScannedImage,
+                onTextRecognized: viewModel.handleRecognizedText,
                 onCancel: viewModel.cancelScanning
             )
         }

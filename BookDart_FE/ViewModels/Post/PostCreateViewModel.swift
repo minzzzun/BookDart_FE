@@ -35,11 +35,19 @@ final class PostCreateViewModel: ObservableObject {
     
     // MARK: - Public Methods
     
-    /// 스캔된 이미지 처리 및 OCR 수행
-    func handleScannedImage(_ image: UIImage) {
+    /// VisionKit에서 인식된 텍스트 처리
+    func handleRecognizedText(_ text: String, image: UIImage?) {
+       
+        
+        // #region agent log
+        if let data = try? JSONSerialization.data(withJSONObject: ["location": "PostCreateViewModel.swift:39", "message": "handleRecognizedText called", "data": ["textLength": text.count, "textPreview": String(text.prefix(30)), "hasImage": image != nil], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "F"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+            let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+            if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+        }
+        // #endregion
         capturedImage = image
+        content = String(text.prefix(50))
         isScanning = false
-        recognizeText(from: image)
     }
     
     /// 게시글 등록
@@ -104,14 +112,35 @@ final class PostCreateViewModel: ObservableObject {
         
         textRecognitionManager.recognizeText(from: image) { [weak self] result in
             DispatchQueue.main.async {
+                // #region agent log
+                let selfExists = self != nil
+                var resultType = "failure"
+                if case .success = result { resultType = "success" }
+                if let data = try? JSONSerialization.data(withJSONObject: ["location": "PostCreateViewModel.swift:110", "message": "recognizeText callback", "data": ["selfExists": selfExists, "resultType": resultType], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "E"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+                    let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+                    if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+                }
+                // #endregion
                 guard let self = self else { return }
                 self.isRecognizing = false
                 
                 switch result {
                 case .success(let text):
+                    // #region agent log
+                    if let data = try? JSONSerialization.data(withJSONObject: ["location": "PostCreateViewModel.swift:118", "message": "OCR success", "data": ["textLength": text.count, "textPreview": String(text.prefix(30))], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "D"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+                        let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+                        if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+                    }
+                    // #endregion
                     self.content = text
                     
                 case .failure(let error):
+                    // #region agent log
+                    if let data = try? JSONSerialization.data(withJSONObject: ["location": "PostCreateViewModel.swift:125", "message": "OCR failure", "data": ["error": error.localizedDescription], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "D"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+                        let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+                        if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+                    }
+                    // #endregion
                     self.errorMessage = error.localizedDescription
                 }
             }

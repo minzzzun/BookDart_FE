@@ -11,7 +11,7 @@ import VisionKit
 @available(iOS 16.0, *)
 struct DataScannerRepresentable: UIViewControllerRepresentable {
     
-    let onCapture: (UIImage) -> Void
+    let onTextRecognized: (String, UIImage?) -> Void
     let onCancel: () -> Void
     
     func makeUIViewController(context: Context) -> DataScannerViewController {
@@ -35,33 +35,56 @@ struct DataScannerRepresentable: UIViewControllerRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(onCapture: onCapture, onCancel: onCancel)
+        Coordinator(onTextRecognized: onTextRecognized, onCancel: onCancel)
     }
     
     // MARK: - Coordinator
     
     class Coordinator: NSObject, DataScannerViewControllerDelegate {
         
-        let onCapture: (UIImage) -> Void
+        let onTextRecognized: (String, UIImage?) -> Void
         let onCancel: () -> Void
         
-        init(onCapture: @escaping (UIImage) -> Void, onCancel: @escaping () -> Void) {
-            self.onCapture = onCapture
+        init(onTextRecognized: @escaping (String, UIImage?) -> Void, onCancel: @escaping () -> Void) {
+            self.onTextRecognized = onTextRecognized
             self.onCancel = onCancel
         }
         
         func dataScanner(_ dataScanner: DataScannerViewController, didTapOn item: RecognizedItem) {
-            // 탭 시 현재 화면 캡처
-            captureScreen(from: dataScanner)
+            // #region agent log
+            if let data = try? JSONSerialization.data(withJSONObject: ["location": "DataScannerRepresentable.swift:53", "message": "didTapOn called", "data": ["itemType": String(describing: type(of: item))], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "B"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+                let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+                if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+            }
+            // #endregion
+            
+            // RecognizedItem에서 직접 텍스트 추출
+            switch item {
+            case .text(let textItem):
+                let recognizedText = textItem.transcript
+                // #region agent log
+                if let data = try? JSONSerialization.data(withJSONObject: ["location": "DataScannerRepresentable.swift:65", "message": "Text extracted from RecognizedItem", "data": ["textLength": recognizedText.count, "textPreview": String(recognizedText.prefix(100))], "timestamp": Date().timeIntervalSince1970 * 1000, "sessionId": "debug-session", "hypothesisId": "F"] as [String: Any], options: []), let str = String(data: data, encoding: .utf8) {
+                    let logPath = "/Users/kimminjun/Desktop/BookDart_FE/.cursor/debug.log"
+                    if let handle = FileHandle(forWritingAtPath: logPath) { handle.seekToEndOfFile(); handle.write((str + "\n").data(using: .utf8)!); handle.closeFile() } else { FileManager.default.createFile(atPath: logPath, contents: (str + "\n").data(using: .utf8), attributes: nil) }
+                }
+                // #endregion
+                
+                // 화면 캡처 (프리뷰용)
+                let image = captureScreen(from: dataScanner)
+                dataScanner.stopScanning()
+                onTextRecognized(recognizedText, image)
+                
+            default:
+                break
+            }
         }
         
-        private func captureScreen(from scanner: DataScannerViewController) {
+        private func captureScreen(from scanner: DataScannerViewController) -> UIImage? {
             let renderer = UIGraphicsImageRenderer(bounds: scanner.view.bounds)
             let image = renderer.image { context in
                 scanner.view.drawHierarchy(in: scanner.view.bounds, afterScreenUpdates: true)
             }
-            scanner.stopScanning()
-            onCapture(image)
+            return image
         }
     }
 }

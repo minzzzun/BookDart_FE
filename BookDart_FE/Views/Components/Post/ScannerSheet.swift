@@ -10,14 +10,14 @@ import VisionKit
 
 struct ScannerSheet: View {
     
-    let onCapture: (UIImage) -> Void
+    let onTextRecognized: (String, UIImage?) -> Void
     let onCancel: () -> Void
     
     var body: some View {
         if #available(iOS 16.0, *), DataScannerViewController.isSupported {
             NavigationStack {
                 DataScannerRepresentable(
-                    onCapture: onCapture,
+                    onTextRecognized: onTextRecognized,
                     onCancel: onCancel
                 )
                 .ignoresSafeArea()
